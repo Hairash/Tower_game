@@ -1,9 +1,10 @@
 import pygame
+import random
 
 pygame.init()
 
 # consts
-FPS = 60
+FPS = 10
 COLOR = {
     'white': (255, 255, 255),
     'red': (255, 0, 0),
@@ -34,8 +35,18 @@ for y in range(FIELD_H + 1):
 
 pygame.display.update()
 
+# if you want to erase everything
+# field_surface.fill(COLOR['white'])
+
 # main loop
 while 1:
+    x = int(random.random() * FIELD_W)
+    y = int(random.random() * FIELD_H)
+    rand_cell = pygame.Rect(FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH) + 1, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH) + 1,
+                            CELL_SIZE, CELL_SIZE)
+    pygame.draw.rect(field_surface, COLOR['black'], rand_cell)
+    pygame.display.update()
+
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
@@ -43,4 +54,7 @@ while 1:
             exit()
 
     clock.tick(FPS)
+
+
+
 
