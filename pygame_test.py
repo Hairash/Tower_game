@@ -40,6 +40,7 @@ pygame.display.update()
 
 # main loop
 while 1:
+    # some animation
     x = int(random.random() * FIELD_W)
     y = int(random.random() * FIELD_H)
     rand_cell = pygame.Rect(FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH) + 1, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH) + 1,
@@ -47,6 +48,7 @@ while 1:
     pygame.draw.rect(field_surface, COLOR['black'], rand_cell)
     pygame.display.update()
 
+    # events
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
