@@ -64,8 +64,8 @@ while 1:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        if event.type == pygame.KEYDOWN:
-            fill_rand_cell(field_surface, COLOR['black'])
+        # if event.type == pygame.KEYDOWN:
+        #     fill_rand_cell(field_surface, COLOR['black'])
 
     pygame.display.update()
     clock.tick(FPS)
