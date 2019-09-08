@@ -19,19 +19,30 @@ FIELD_WIDTH =  FIELD_W * (CELL_SIZE + LINE_WIDTH)
 FIELD_HEIGHT = FIELD_H * (CELL_SIZE + LINE_WIDTH)
 
 
+def draw_grid(field_surface):
+    for x in range(FIELD_W + 1):
+        pygame.draw.line(field_surface, COLOR['white'], [FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH), FIELD_INDENT],
+                         [FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH), FIELD_INDENT + FIELD_HEIGHT])
+    for y in range(FIELD_H + 1):
+        pygame.draw.line(field_surface, COLOR['white'], [FIELD_INDENT, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH)],
+                         [FIELD_INDENT + FIELD_WIDTH, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH)])
+
+
+def fill_rand_cell(field_surface, color):
+    x = int(random.random() * FIELD_W)
+    y = int(random.random() * FIELD_H)
+    rand_cell = pygame.Rect(FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH) + 1, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH) + 1,
+                            CELL_SIZE, CELL_SIZE)
+    pygame.draw.rect(field_surface, color, rand_cell)
+
+
 # create drawing field
 clock = pygame.time.Clock()
 
 field_surface = pygame.display.set_mode((FIELD_WIDTH + 2 * FIELD_INDENT, FIELD_HEIGHT + 2 * FIELD_INDENT))
 field_rect = pygame.Rect(FIELD_INDENT, FIELD_INDENT, FIELD_WIDTH, FIELD_HEIGHT)
 pygame.draw.rect(field_surface, COLOR['red'], field_rect)
-# grid
-for x in range(FIELD_W + 1):
-    pygame.draw.line(field_surface, COLOR['white'], [FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH), FIELD_INDENT],
-                     [FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH), FIELD_INDENT + FIELD_HEIGHT])
-for y in range(FIELD_H + 1):
-    pygame.draw.line(field_surface, COLOR['white'], [FIELD_INDENT, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH)],
-                     [FIELD_INDENT + FIELD_WIDTH, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH)])
+draw_grid(field_surface)
 
 pygame.display.update()
 
@@ -41,11 +52,7 @@ pygame.display.update()
 # main loop
 while 1:
     # some animation
-    x = int(random.random() * FIELD_W)
-    y = int(random.random() * FIELD_H)
-    rand_cell = pygame.Rect(FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH) + 1, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH) + 1,
-                            CELL_SIZE, CELL_SIZE)
-    pygame.draw.rect(field_surface, COLOR['black'], rand_cell)
+    fill_rand_cell(field_surface, COLOR['black'])
     pygame.display.update()
 
     # events
