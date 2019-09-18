@@ -1,1 +1,75 @@
 import pygame
+import random
+
+pygame.init()
+
+# consts
+FPS = 10
+COLOR = {
+    'white': (255, 255, 255),
+    'red': (255, 0, 0),
+    'black': (0, 0, 0)
+}
+FIELD_W = 10 # number of cells in line
+FIELD_H = 10 # number of cells in column
+CELL_SIZE = 50
+LINE_WIDTH = 1
+FIELD_INDENT = 20
+FIELD_WIDTH =  FIELD_W * (CELL_SIZE + LINE_WIDTH)
+FIELD_HEIGHT = FIELD_H * (CELL_SIZE + LINE_WIDTH)
+
+
+def draw_grid(field_surface, color):
+    for x in range(FIELD_W + 1):
+        pygame.draw.line(field_surface, color, [FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH), FIELD_INDENT],
+                         [FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH), FIELD_INDENT + FIELD_HEIGHT])
+    for y in range(FIELD_H + 1):
+        pygame.draw.line(field_surface, color, [FIELD_INDENT, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH)],
+                         [FIELD_INDENT + FIELD_WIDTH, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH)])
+
+
+def fill_rand_cell(field_surface, color):
+    x = int(random.random() * FIELD_W)
+    y = int(random.random() * FIELD_H)
+    rand_cell = pygame.Rect(FIELD_INDENT + x * (CELL_SIZE + LINE_WIDTH) + 1, FIELD_INDENT + y * (CELL_SIZE + LINE_WIDTH) + 1,
+                            CELL_SIZE, CELL_SIZE)
+    pygame.draw.rect(field_surface, color, rand_cell)
+
+
+# create drawing field
+clock = pygame.time.Clock()
+
+field_surface = pygame.display.set_mode((FIELD_WIDTH + 2 * FIELD_INDENT, FIELD_HEIGHT + 2 * FIELD_INDENT))
+field_rect = pygame.Rect(FIELD_INDENT, FIELD_INDENT, FIELD_WIDTH, FIELD_HEIGHT)
+pygame.draw.rect(field_surface, COLOR['red'], field_rect)
+draw_grid(field_surface, COLOR['white'])
+
+# create field array
+# 0 - empty place
+# 1 - tower
+field_array = [[0] * FIELD_W for y in range(FIELD_H)]
+# field_array[0][0] = 1
+# print(field_array)
+
+pygame.display.update()
+
+# if you want to erase everything
+# field_surface.fill(COLOR['white'])
+
+# main loop
+while 1:
+    # events
+    events = pygame.event.get()
+    for event in events:
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+        # if event.type == pygame.KEYDOWN:
+        #     fill_rand_cell(field_surface, COLOR['black'])
+
+    pygame.display.update()
+    clock.tick(FPS)
+
+
+
+
