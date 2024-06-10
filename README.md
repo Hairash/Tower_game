@@ -1,6 +1,6 @@
 # Railroad game
 
-Don't push in master!
+Push in master!
 
 ## MVP
 * Field with square cells
