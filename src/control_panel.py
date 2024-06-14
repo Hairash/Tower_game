@@ -13,6 +13,7 @@ class ControlPanel:
             GameMode.build_road: pygame.Rect(10, 170, *button_size),
         }
 
+        # TODO: Move to const
         station_image = pygame.image.load('assets/station_button.png')
         self.station_image = pygame.transform.scale(station_image, button_size)
 

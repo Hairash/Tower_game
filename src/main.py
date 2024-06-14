@@ -11,7 +11,7 @@ def main():
     pygame.init()
 
     # Set up the display
-    field = Field(FIELD.width, FIELD.height, FIELD.cell_size)
+    field = Field(FIELD.width, FIELD.height, FIELD.cell_width, FIELD.cell_height)
     width, height = field.from_grid(FIELD.width, FIELD.height)
 
     screen = pygame.display.set_mode((width, height))
