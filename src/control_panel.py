@@ -27,9 +27,12 @@ class ControlPanel:
         screen.blit(self.station_image, self.rects[GameMode.build_station])
         screen.blit(self.road_image, self.rects[GameMode.build_road])
 
-    def mode_changed(self, pos):
+    def mode_changed(self, pos, current_mode):
         for mode, rect in self.rects.items():
             if rect.collidepoint(pos):
-                return True, mode
+                if mode == current_mode:
+                    return True, GameMode.none
+                else:
+                    return True, mode
 
         return False, None

@@ -7,7 +7,7 @@ from game_mode import GameMode
 
 class Game:
     def __init__(self, field):
-        self.mode = GameMode.build_station
+        self.mode = GameMode.none
         self.stations = set()
         self.roads = set()
 
@@ -24,7 +24,7 @@ class Game:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     # Check if left mouse button was clicked
                     if event.button == 1:
-                        mode_changed, mode = self.control_panel.mode_changed(event.pos)
+                        mode_changed, mode = self.control_panel.mode_changed(event.pos, self.mode)
                         if mode_changed:
                             self.mode = mode
                         else:
