@@ -26,7 +26,7 @@ class Field:
 
         return col, row
 
-    def draw_grid(self, screen, stations, roads):
+    def draw_grid(self, screen, stations, roads, planning_roads):
         for row in range(self.height):
             for col in range(self.width):
                 x, y = self.from_grid(col, row)
@@ -35,4 +35,7 @@ class Field:
                     screen.blit(self.station_image, rect.topleft)
                 elif (row, col) in roads:
                     screen.blit(self.road_image, rect.topleft)
+                elif (row, col) in planning_roads:
+                    screen.blit(self.road_image, rect.topleft, special_flags=pygame.BLEND_ADD)
+
                 pygame.draw.rect(screen, COLOR.black, rect, 1)
