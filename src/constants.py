@@ -5,7 +5,9 @@ class FIELD:
     height = 15
 
     # cell size in pixels
-    cell_size = 50
+    cell_size = 50  # TODO: remove it
+    cell_width = 50
+    cell_height = 35
 
 
 class COLOR:

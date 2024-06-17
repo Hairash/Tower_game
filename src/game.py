@@ -13,7 +13,7 @@ class Game:
         self.roads = set()
         self.planning_roads = []
 
-        self.control_panel = ControlPanel(field.cell_size)
+        self.control_panel = ControlPanel(field.cell_width)
         self.field = field
 
         self.running = True
@@ -60,6 +60,7 @@ class Game:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     # Check if left mouse button was clicked
                     if event.button == 1:
+                        # TODO: Move to functions
                         mode_changed, mode = self.control_panel.mode_changed(event.pos, self.mode)
                         if mode_changed:
                             self.mode = mode
@@ -67,26 +68,26 @@ class Game:
                             col, row = self.field.to_grid(event.pos[0], event.pos[1])
                             print(col, row, self.mode)
 
-                            if (row, col) in self.stations:
+                            if (col, row) in self.stations:
                                 pass
-                            if (row, col) in self.roads:
+                            if (col, row) in self.roads:
                                 pass
 
                             if self.mode == GameMode.build_station:
-                                self.stations.add((row, col))
+                                self.stations.add((col, row))
                             elif self.mode == GameMode.build_road:
                                 # start building a road
                                 if not self.planning_roads:
-                                    self.planning_roads.append((row, col))
+                                    self.planning_roads.append((col, row))
                                 # finish building a road
                                 else:
-                                    for (row, col) in self.planning_roads:
-                                        self.roads.add((row, col))
+                                    for (col, row) in self.planning_roads:
+                                        self.roads.add((col, row))
                                     self.planning_roads.clear()
                 elif event.type == pygame.MOUSEMOTION:
                     if self.planning_roads:
                         col, row = self.field.to_grid(event.pos[0], event.pos[1])
-                        self.planning_roads = self.find_path(next(iter(self.planning_roads)), (row, col))
+                        self.planning_roads = self.find_path(next(iter(self.planning_roads)), (col, row))
 
             screen.fill(COLOR.background)
             self.field.draw_grid(screen, self.stations, self.roads, self.planning_roads)
