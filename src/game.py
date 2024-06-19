@@ -22,7 +22,7 @@ class Game:
         self.control_panel = ControlPanel(field.cell_width)
         self.field = field
 
-        self.train = Train(self.field.cell_width, start_x=0, start_y=370)
+        self.train = Train(self.field.cell_width, start_pos=(0, 370))
         self.train_group = pygame.sprite.Group()
 
         self.running = True

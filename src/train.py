@@ -2,15 +2,13 @@ import pygame
 
 
 class Train(pygame.sprite.Sprite):
-    def __init__(self, scale_size, start_x, start_y):
+    def __init__(self, scale_size, start_pos):
         super().__init__()
-
-        scale_size = (scale_size, scale_size)
 
         # image and rect
         image = pygame.image.load('assets/train_button.png')
-        self.image = pygame.transform.scale(image, scale_size)
-        self.rect = self.image.get_rect(midleft=(start_x, start_y))
+        self.image = pygame.transform.scale(image, (scale_size, scale_size))
+        self.rect = self.image.get_rect(midleft=start_pos)
 
         # movement
         self.move_speed = 30
