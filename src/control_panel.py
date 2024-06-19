@@ -11,14 +11,17 @@ class ControlPanel:
         self.rects = {
             GameMode.build_station: pygame.Rect(10, 110, *button_size),
             GameMode.build_road: pygame.Rect(10, 170, *button_size),
+            GameMode.start_train: pygame.Rect(10, 230, *button_size),
         }
 
-        # TODO: Move to const
         station_image = pygame.image.load('assets/station_button.png')
         self.station_image = pygame.transform.scale(station_image, button_size)
 
         road_image = pygame.image.load('assets/railroad_button.png')
         self.road_image = pygame.transform.scale(road_image, button_size)
+
+        train_image = pygame.image.load('assets/train_button.png')
+        self.train_image = pygame.transform.scale(train_image, button_size)
 
     def draw(self, screen, game_mode):
         for mode, rect in self.rects.items():
@@ -27,6 +30,7 @@ class ControlPanel:
 
         screen.blit(self.station_image, self.rects[GameMode.build_station])
         screen.blit(self.road_image, self.rects[GameMode.build_road])
+        screen.blit(self.train_image, self.rects[GameMode.start_train])
 
     def mode_changed(self, pos, current_mode):
         for mode, rect in self.rects.items():

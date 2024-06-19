@@ -1,13 +1,19 @@
 import pygame
+import time
+
 from collections import deque
 
 from constants import COLOR
 from control_panel import ControlPanel
 from game_mode import GameMode
+from train import Train
 
 
 class Game:
     def __init__(self, field):
+        # basic setup
+        self.clock = pygame.time.Clock()
+
         self.mode = GameMode.none
         self.stations = set()
         self.roads = set()
@@ -15,6 +21,9 @@ class Game:
 
         self.control_panel = ControlPanel(field.cell_width)
         self.field = field
+
+        self.train = Train(self.field.cell_width, start_x=0, start_y=370)
+        self.train_group = pygame.sprite.Group()
 
         self.running = True
 
@@ -54,7 +63,12 @@ class Game:
         return []
 
     def run(self, screen):
+        prev_time = time.time()
+
         while self.running:
+            dt = time.time() - prev_time
+            prev_time = time.time()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -64,6 +78,11 @@ class Game:
                         # TODO: Move to functions
                         mode_changed, mode = self.control_panel.mode_changed(event.pos, self.mode)
                         if mode_changed:
+                            if self.mode == GameMode.start_train:
+                                self.train_group.remove(self.train)
+                            elif mode == GameMode.start_train:
+                                self.train_group.add(self.train)
+
                             self.mode = mode
                         else:
                             col, row = self.field.to_grid(event.pos[0], event.pos[1])
@@ -93,4 +112,10 @@ class Game:
             screen.fill(COLOR.background)
             self.field.draw_grid(screen, self.stations, self.roads, self.planning_roads)
             self.control_panel.draw(screen, self.mode)
+
+            # Test draw a train
+            self.train_group.update(dt)
+            self.train_group.draw(screen)
+            self.clock.tick(30)
+
             pygame.display.flip()
