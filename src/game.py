@@ -26,6 +26,7 @@ class Game:
         :param end: Tuple (x2, y2) representing the end coordinates.
         :return: List of coordinates representing the path from start to end.
         """
+        # TODO: forbid 90-degree turns
         # Define the 8 possible movements (N, S, E, W, NE, NW, SE, SW)
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
 

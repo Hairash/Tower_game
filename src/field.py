@@ -1,6 +1,7 @@
 import pygame
 
 from constants import COLOR
+from helpers import load_folder
 
 
 GREAT_FACTOR = 1.75
@@ -20,49 +21,12 @@ class Field:
             road_image,
             (self.cell_width * GREAT_FACTOR, self.cell_height * GREAT_FACTOR),
         )
-        self.road_images = self.RoadImages(
-            self.cell_width * GREAT_FACTOR,
-            self.cell_height * GREAT_FACTOR,
-        )
-
-    class RoadImages:
-        def __init__(self, cell_width, cell_height):
-            self.horizontal = pygame.transform.scale(
-                pygame.image.load('assets/horizontal_alpha.png'), (cell_width, cell_height)
-            )
-            self.vertical = pygame.transform.scale(
-                pygame.image.load('assets/vertical_alpha.png'), (cell_width, cell_height)
-            )
-            self.diagonal1 = pygame.transform.scale(
-                pygame.image.load('assets/diagonal1_alpha.png'), (cell_width, cell_height)
-            )
-            self.diagonal2 = pygame.transform.scale(
-                pygame.image.load('assets/diagonal2_alpha.png'), (cell_width, cell_height)
-            )
-            self.turn45_e_nw = pygame.transform.scale(
-                pygame.image.load('assets/turn45_e_nw.png'), (cell_width, cell_height)
-            )
-            self.turn45_e_sw = pygame.transform.scale(
-                pygame.image.load('assets/turn45_e_sw.png'), (cell_width, cell_height)
-            )
-            self.turn45_n_se = pygame.transform.scale(
-                pygame.image.load('assets/turn45_n_se.png'), (cell_width, cell_height)
-            )
-            self.turn45_n_sw = pygame.transform.scale(
-                pygame.image.load('assets/turn45_n_sw.png'), (cell_width, cell_height)
-            )
-            self.turn45_s_ne = pygame.transform.scale(
-                pygame.image.load('assets/turn45_s_ne.png'), (cell_width, cell_height)
-            )
-            self.turn45_s_nw = pygame.transform.scale(
-                pygame.image.load('assets/turn45_s_nw.png'), (cell_width, cell_height)
-            )
-            self.turn45_w_ne = pygame.transform.scale(
-                pygame.image.load('assets/turn45_w_ne.png'), (cell_width, cell_height)
-            )
-            self.turn45_w_se = pygame.transform.scale(
-                pygame.image.load('assets/turn45_w_se.png'), (cell_width, cell_height)
-            )
+        self.road_images = {
+            name: pygame.transform.scale(
+                surface,
+                (self.cell_width * GREAT_FACTOR, self.cell_height * GREAT_FACTOR)
+            ) for (name, surface) in load_folder('assets/railroads').items()
+        }
 
     def from_grid(self, col, row):
         x = col * self.cell_width
@@ -90,48 +54,76 @@ class Field:
                     road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
                     screen.blit(road_image, (road_x, road_y))
                 elif (col, row) in planning_roads:
-                    screen.blit(self.road_image, rect.topleft, special_flags=pygame.BLEND_ADD)
+                    road_image = self.select_road_image(col, row, planning_roads)
+                    road_x, road_y = rect.topleft
+                    road_x -= self.cell_width * (GREAT_FACTOR - 1) / 2
+                    road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
+                    screen.blit(road_image, (road_x, road_y), special_flags=pygame.BLEND_ADD)
 
                 pygame.draw.rect(screen, COLOR.black, rect, 1)
 
     def select_road_image(self, x, y, roads):
-        if (x - 1, y) in roads:
-            if (x + 1, y) in roads:
-                return self.road_images.horizontal
-            elif (x + 1, y - 1) in roads:
-                return self.road_images.turn45_w_ne
-            elif (x + 1, y + 1) in roads:
-                return self.road_images.turn45_w_se
-            else:
-                return self.road_images.horizontal
-        elif (x - 1, y - 1) in roads:
-            if (x + 1, y + 1) in roads:
-                return self.road_images.diagonal2
-            elif (x + 1, y) in roads:
-                return self.road_images.turn45_e_nw
-            elif (x, y + 1) in roads:
-                return self.road_images.turn45_s_nw
-            else:
-                return self.road_images.diagonal2
-        elif (x, y - 1) in roads:
-            if (x, y + 1) in roads:
-                return self.road_images.vertical
-            elif (x + 1, y + 1) in roads:
-                return self.road_images.turn45_n_se
-            elif (x - 1, y + 1) in roads:
-                return self.road_images.turn45_n_sw
-            else:
-                return self.road_images.vertical
-        elif (x + 1, y - 1) in roads:
-            if (x - 1, y + 1) in roads:
-                return self.road_images.diagonal1
-            elif (x - 1, y) in roads:
-                return self.road_images.turn45_w_ne
-            elif (x, y + 1) in roads:
-                return self.road_images.turn45_s_ne
-            else:
-                return self.road_images.diagonal1
-        elif (x - 1, y + 1) in roads and (x + 1, y) in roads:
-            return self.road_images.turn45_e_sw
-        else:
-            return self.road_images.horizontal
+        neighbors = {
+            'W': (x - 1, y) in roads,
+            'E': (x + 1, y) in roads,
+            'N': (x, y - 1) in roads,
+            'S': (x, y + 1) in roads,
+            'NW': (x - 1, y - 1) in roads,
+            'NE': (x + 1, y - 1) in roads,
+            'SW': (x - 1, y + 1) in roads,
+            'SE': (x + 1, y + 1) in roads
+        }
+
+        # The track is on the end of the road
+        if sum(neighbors.values()) == 1:
+            if neighbors['W'] or neighbors['E']:
+                return self.road_images['horizontal']
+            elif neighbors['N'] or neighbors['S']:
+                return self.road_images['vertical']
+            elif neighbors['NW'] or neighbors['SE']:
+                return self.road_images['diagonal2']
+            elif neighbors['NE'] or neighbors['SW']:
+                return self.road_images['diagonal1']
+
+        # diagonals
+        if neighbors['NE'] and neighbors['SW']:
+            return self.road_images['diagonal1']
+
+        if neighbors['NW'] and neighbors['SE']:
+            return self.road_images['diagonal2']
+
+        # turns
+        if neighbors['W']:
+            if neighbors['E']:
+                return self.road_images['horizontal']
+            elif neighbors['NE']:
+                return self.road_images['turn45_w_ne']
+            elif neighbors['SE']:
+                return self.road_images['turn45_w_se']
+            return self.road_images['horizontal']
+
+        if neighbors['E']:
+            if neighbors['NW']:
+                return self.road_images['turn45_e_nw']
+            elif neighbors['SW']:
+                return self.road_images['turn45_e_sw']
+            return self.road_images['horizontal']
+
+        if neighbors['N']:
+            if neighbors['S']:
+                return self.road_images['vertical']
+            elif neighbors['SE']:
+                return self.road_images['turn45_n_se']
+            elif neighbors['SW']:
+                return self.road_images['turn45_n_sw']
+            return self.road_images['vertical']
+
+        if neighbors['S']:
+            if neighbors['NE']:
+                return self.road_images['turn45_s_ne']
+            elif neighbors['NW']:
+                return self.road_images['turn45_s_nw']
+            return self.road_images['vertical']
+
+        return self.road_images['horizontal']
+
