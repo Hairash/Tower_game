@@ -1,11 +1,13 @@
+class Window:
+    width = 1280
+    height = 720
 
 
 class FIELD:
-    width = 18
-    height = 15
+    width = 180
+    height = 150
 
     # cell size in pixels
-    cell_size = 50  # TODO: remove it
     cell_width = 50
     cell_height = 35
 

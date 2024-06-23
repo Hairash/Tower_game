@@ -12,10 +12,10 @@ def main():
 
     # Set up the display
     field = Field(FIELD.width, FIELD.height, FIELD.cell_width, FIELD.cell_height)
-    width, height = field.from_grid(FIELD.width, FIELD.height)
 
-    screen = pygame.display.set_mode((width, height))
+    screen = pygame.display.set_mode((Window.width, Window.height))
     pygame.display.set_caption('Railroad')
+    pygame.event.set_grab(True)
 
     game = Game(field)
     game.run(screen)
