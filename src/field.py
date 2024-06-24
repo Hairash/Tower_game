@@ -28,11 +28,6 @@ class Field:
             ) for (name, surface) in load_folder('assets/railroads').items()
         }
 
-    def align_grid(self, x, y):
-        col, row = self.to_grid(x, y)
-
-        return self.from_grid(col, row)
-
     def from_grid(self, col, row):
         x = col * self.cell_width
         y = row * self.cell_height
