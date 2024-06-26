@@ -40,11 +40,17 @@ class Field:
 
         return col, row
 
-    def draw_grid(self, screen, stations, roads, planning_roads):
+    def draw(self, screen, stations, roads, planning_roads, offset):
         for row in range(self.height):
             for col in range(self.width):
                 x, y = self.from_grid(col, row)
                 rect = pygame.Rect(x, y, self.cell_width, self.cell_height)
+                rect.topleft += offset
+
+                # draw the grid
+                pygame.draw.rect(screen, COLOR.black, rect, 1)
+
+                # draw objects on the grid
                 if (col, row) in stations:
                     screen.blit(self.station_image, rect.topleft)
                 elif (col, row) in roads:
@@ -59,8 +65,6 @@ class Field:
                     road_x -= self.cell_width * (GREAT_FACTOR - 1) / 2
                     road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
                     screen.blit(road_image, (road_x, road_y), special_flags=pygame.BLEND_ADD)
-
-                pygame.draw.rect(screen, COLOR.black, rect, 1)
 
     def select_road_image(self, x, y, roads):
         neighbors = {

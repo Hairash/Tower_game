@@ -1,6 +1,7 @@
 import pygame
 from collections import deque
 
+from src.camera import Camera
 from constants import COLOR
 from control_panel import ControlPanel
 from game_mode import GameMode
@@ -17,6 +18,8 @@ class Game:
         self.field = field
 
         self.running = True
+
+        self.camera = Camera()
 
     def find_path(self, start, end):
         """
@@ -53,30 +56,39 @@ class Game:
 
         return []
 
+    def mode_toggle(self, mode):
+        if self.mode == mode:
+            self.mode = GameMode.none
+        else:
+            self.mode = mode
+
     def run(self, screen):
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                    elif event.key == pygame.K_s:
+                        self.mode_toggle(GameMode.build_station)
+                    elif event.key == pygame.K_r:
+                        self.mode_toggle(GameMode.build_road)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     # Check if left mouse button was clicked
                     if event.button == 1:
-                        # TODO: Move to functions
+                        # TODO: Move to functions!!!
                         mode_changed, mode = self.control_panel.mode_changed(event.pos, self.mode)
                         if mode_changed:
                             self.mode = mode
                         else:
-                            col, row = self.field.to_grid(event.pos[0], event.pos[1])
-                            print(col, row, self.mode)
-
-                            if (col, row) in self.stations:
-                                pass
-                            if (col, row) in self.roads:
-                                pass
+                            mouse_coords_on_field = self.camera.get_mouse_coords_on_field(event.pos)
+                            col, row = self.field.to_grid(*mouse_coords_on_field)
 
                             if self.mode == GameMode.build_station:
                                 self.stations.add((col, row))
                             elif self.mode == GameMode.build_road:
+
                                 # start building a road
                                 if not self.planning_roads:
                                     self.planning_roads.append((col, row))
@@ -85,12 +97,39 @@ class Game:
                                     for (col, row) in self.planning_roads:
                                         self.roads.add((col, row))
                                     self.planning_roads.clear()
-                elif event.type == pygame.MOUSEMOTION:
-                    if self.planning_roads:
-                        col, row = self.field.to_grid(event.pos[0], event.pos[1])
-                        self.planning_roads = self.find_path(next(iter(self.planning_roads)), (col, row))
 
-            screen.fill(COLOR.background)
-            self.field.draw_grid(screen, self.stations, self.roads, self.planning_roads)
+                elif event.type == pygame.MOUSEMOTION:
+                    # planning a railroad
+                    if self.planning_roads:
+                        mouse_coords_on_field = self.camera.get_mouse_coords_on_field(event.pos)
+                        col, row = self.field.to_grid(*mouse_coords_on_field)
+
+                        if self.planning_roads[-1] == (col, row):
+                            continue
+
+                        self.planning_roads = self.find_path(self.planning_roads[0], (col, row))
+
+                elif event.type == pygame.MOUSEWHEEL:
+                    # zoom
+                    # TODO: to consts
+                    self.camera.zoom_scale += event.y * 0.03
+                    if self.camera.zoom_scale > 2:
+                        self.camera.zoom_scale = 2
+                    if self.camera.zoom_scale < 0.5:
+                        self.camera.zoom_scale = 0.5
+
+            self.camera.mouse_control()
+
+            self.camera.internal_surface.fill(COLOR.background)
+
+            self.field.draw(
+                self.camera.internal_surface,
+                self.stations,
+                self.roads,
+                self.planning_roads,
+                self.camera.offset + self.camera.internal_offset,
+            )
+            self.camera.draw(screen)
             self.control_panel.draw(screen, self.mode)
+
             pygame.display.flip()
