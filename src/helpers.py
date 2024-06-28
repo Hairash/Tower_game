@@ -7,6 +7,6 @@ def load_folder(path):
     for root, _, files in os.walk(path):
         for file in files:
             # Remove '.png' for asset name
-            assets[file[:-4]] = pygame.image.load(os.path.join(root, file))
+            assets[file.split('.')[0]] = pygame.image.load(os.path.join(root, file))
 
     return assets

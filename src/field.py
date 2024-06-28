@@ -46,6 +46,7 @@ class Field:
                 x, y = self.from_grid(col, row)
                 rect = pygame.Rect(x, y, self.cell_width, self.cell_height)
                 rect.topleft += offset
+                road_x, road_y = rect.topleft
 
                 # draw the grid
                 pygame.draw.rect(screen, COLOR.black, rect, 1)
@@ -54,17 +55,27 @@ class Field:
                 if (col, row) in stations:
                     screen.blit(self.station_image, rect.topleft)
                 elif (col, row) in roads:
-                    road_image = self.select_road_image(col, row, roads)
-                    road_x, road_y = rect.topleft
-                    road_x -= self.cell_width * (GREAT_FACTOR - 1) / 2
-                    road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
-                    screen.blit(road_image, (road_x, road_y))
+                    self.blit_road_image(
+                        screen,
+                        road_x, road_y,
+                        col, row,
+                        road_set=roads,
+                    )
                 elif (col, row) in planning_roads:
-                    road_image = self.select_road_image(col, row, planning_roads)
-                    road_x, road_y = rect.topleft
-                    road_x -= self.cell_width * (GREAT_FACTOR - 1) / 2
-                    road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
-                    screen.blit(road_image, (road_x, road_y), special_flags=pygame.BLEND_ADD)
+                    self.blit_road_image(
+                        screen,
+                        road_x, road_y,
+                        col, row,
+                        road_set=planning_roads,
+                        special_flags=pygame.BLEND_ADD,
+                    )
+
+    def blit_road_image(self, screen, x, y, col, row, road_set, special_flags=0):
+        image = self.select_road_image(col, row, road_set)
+        x -= self.cell_width * (GREAT_FACTOR - 1) / 2
+        y -= self.cell_height * (GREAT_FACTOR - 1) / 2
+
+        screen.blit(image, (x, y), special_flags=special_flags)
 
     def select_road_image(self, x, y, roads):
         neighbors = {
@@ -78,7 +89,7 @@ class Field:
             'SE': (x + 1, y + 1) in roads
         }
 
-        # The track is on the end of the road
+        # The track is at the end of the road
         if sum(neighbors.values()) == 1:
             if neighbors['W'] or neighbors['E']:
                 return self.road_images['horizontal']
