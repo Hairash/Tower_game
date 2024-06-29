@@ -8,11 +8,14 @@ GREAT_FACTOR = 1.75
 
 
 class Field:
-    def __init__(self, width, height, cell_width, cell_height):
-        self.width = width
-        self.height = height
+    def __init__(self, cols, rows, cell_width, cell_height):
+        self.cols = cols
+        self.rows = rows
         self.cell_width = cell_width
         self.cell_height = cell_height
+        self.width = cols * cell_width
+        self.height = rows * cell_height
+        self.surface = pygame.Surface((self.width, self.height))
 
         station_image = pygame.image.load('assets/station.png')
         self.station_image = pygame.transform.scale(station_image, (self.cell_width, self.cell_height))
@@ -40,31 +43,31 @@ class Field:
 
         return col, row
 
-    def draw(self, screen, stations, roads, planning_roads, offset):
-        for row in range(self.height):
-            for col in range(self.width):
+    def draw(self, stations, roads, planning_roads):
+        self.surface.fill(COLOR.background)
+        for row in range(self.rows):
+            for col in range(self.cols):
                 x, y = self.from_grid(col, row)
                 rect = pygame.Rect(x, y, self.cell_width, self.cell_height)
-                rect.topleft += offset
 
                 # draw the grid
-                pygame.draw.rect(screen, COLOR.black, rect, 1)
+                pygame.draw.rect(self.surface, COLOR.black, rect, 1)
 
                 # draw objects on the grid
                 if (col, row) in stations:
-                    screen.blit(self.station_image, rect.topleft)
+                    self.surface.blit(self.station_image, rect.topleft)
                 elif (col, row) in roads:
                     road_image = self.select_road_image(col, row, roads)
                     road_x, road_y = rect.topleft
                     road_x -= self.cell_width * (GREAT_FACTOR - 1) / 2
                     road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
-                    screen.blit(road_image, (road_x, road_y))
+                    self.surface.blit(road_image, (road_x, road_y))
                 elif (col, row) in planning_roads:
                     road_image = self.select_road_image(col, row, planning_roads)
                     road_x, road_y = rect.topleft
                     road_x -= self.cell_width * (GREAT_FACTOR - 1) / 2
                     road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
-                    screen.blit(road_image, (road_x, road_y), special_flags=pygame.BLEND_ADD)
+                    self.surface.blit(road_image, (road_x, road_y), special_flags=pygame.BLEND_ADD)
 
     def select_road_image(self, x, y, roads):
         neighbors = {
