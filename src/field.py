@@ -53,21 +53,33 @@ class Field:
                 # draw the grid
                 pygame.draw.rect(self.surface, COLOR.black, rect, 1)
 
+                road_x, road_y = rect.topleft
+
                 # draw objects on the grid
                 if (col, row) in stations:
                     self.surface.blit(self.station_image, rect.topleft)
                 elif (col, row) in roads:
-                    road_image = self.select_road_image(col, row, roads)
-                    road_x, road_y = rect.topleft
-                    road_x -= self.cell_width * (GREAT_FACTOR - 1) / 2
-                    road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
-                    self.surface.blit(road_image, (road_x, road_y))
+                    self.blit_road_image(
+                        self.surface,
+                        road_x, road_y,
+                        col, row,
+                        road_set=roads,
+                    )
                 elif (col, row) in planning_roads:
-                    road_image = self.select_road_image(col, row, planning_roads)
-                    road_x, road_y = rect.topleft
-                    road_x -= self.cell_width * (GREAT_FACTOR - 1) / 2
-                    road_y -= self.cell_height * (GREAT_FACTOR - 1) / 2
-                    self.surface.blit(road_image, (road_x, road_y), special_flags=pygame.BLEND_ADD)
+                    self.blit_road_image(
+                        self.surface,
+                        road_x, road_y,
+                        col, row,
+                        road_set=planning_roads,
+                        special_flags=pygame.BLEND_ADD,
+                    )
+
+    def blit_road_image(self, screen, x, y, col, row, road_set, special_flags=0):
+        image = self.select_road_image(col, row, road_set)
+        x -= self.cell_width * (GREAT_FACTOR - 1) / 2
+        y -= self.cell_height * (GREAT_FACTOR - 1) / 2
+
+        screen.blit(image, (x, y), special_flags=special_flags)
 
     def select_road_image(self, x, y, roads):
         neighbors = {
